@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>ФОРУМ</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function loadMessages() {
+                $.get('/get_messages', function(data) {
+                    var messages = data.messages;
+                    var html = '';
+                    for (var i = 0; i < messages.length; i++) {
+                        html += '<p>' + messages[i] + '</p>';
+                    }
+                    $('#history').html(html);
+                });
+            }
+
+            loadMessages();
+
+            $('#update_div').submit(function(event) {
+                event.preventDefault();
+                var message = $('input[name="message"]').val();
+                $.post('/update_messages', { message: message }, function(data) {
+                    loadMessages();
+                    $('input[name="message"]').val('');
+                });
+            });
+
+            setInterval(function() {
+                loadMessages();
+            }, 5000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Мессанджер</h1>
+    <small>{{username}}</small>
+    <form id="update_div" method="POST">
+        <input type="text" name="message" placeholder="Написать...">
+        <button type="submit">Отправить</button>
+    </form>
+    <div id="history"></div>
+</body>
+</html>
